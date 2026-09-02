@@ -1,0 +1,21 @@
+# Binaries & build artifacts
+bin/
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Environment & credentials
+.env
+.env.local
+*.secret.json
+
+# OS & IDE files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.log
+node_modules/
