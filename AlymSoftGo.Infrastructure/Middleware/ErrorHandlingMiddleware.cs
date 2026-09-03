@@ -42,28 +42,32 @@ namespace AlymSoftGo.Infrastructure.Middleware
             switch (exception)
             {
                 case SPBusinessException businessEx:
-                    response.Code = businessEx.ResponseCode;
+                    response.ResponseType = businessEx.ResponseType; // 3 (CustomError)
+                    response.ResponseCode = businessEx.ResponseCode; // e.g. "INVALID_CREDENTIALS" / "InvalidPhone"
                     response.Message = businessEx.Message;
                     response.Details = businessEx.Errors;
-                    statusCode = GetHttpStatusForBusinessError(businessEx.ResponseCode);
+                    statusCode = GetHttpStatusForBusinessError(businessEx.EnumCode);
                     break;
 
                 case SPUnexpectedException spEx:
-                    response.Code = ResponseCode.UnexpectedError;
-                    response.Message = spEx.ErrorDescription;
+                    response.ResponseType = 2; // 2 (UnexpectedError)
+                    response.ResponseCode = "UnexpectedError";
+                    response.Message = spEx.ErrorDescription ?? spEx.Message;
                     response.Details = new { errorTitle = spEx.ErrorTitle, technicalDetails = spEx.TechnicalDetails };
                     statusCode = HttpStatusCode.InternalServerError;
                     break;
 
                 case UnauthorizedAccessException:
-                    response.Code = ResponseCode.Unauthorized;
+                    response.ResponseType = 3;
+                    response.ResponseCode = "Unauthorized";
                     response.Message = "Unauthorized access.";
                     statusCode = HttpStatusCode.Unauthorized;
                     break;
 
                 default:
-                    response.Code = ResponseCode.UnexpectedError;
-                    response.Message = "An unexpected error occurred on the server.";
+                    response.ResponseType = 2;
+                    response.ResponseCode = "UnexpectedError";
+                    response.Message = exception.Message ?? "An unexpected error occurred on the server.";
                     statusCode = HttpStatusCode.InternalServerError;
                     break;
             }
@@ -88,7 +92,7 @@ namespace AlymSoftGo.Infrastructure.Middleware
 
                 ResponseCode.Unauthorized or ResponseCode.InvalidCredentials => HttpStatusCode.Unauthorized,
                 ResponseCode.Forbidden => HttpStatusCode.Forbidden,
-                ResponseCode.DuplicateRecord or ResponseCode.UserAlreadyExists => HttpStatusCode.Conflict,
+                ResponseCode.DuplicateRecord or ResponseCode.UserAlreadyExists or ResponseCode.EmailAlreadyExists => HttpStatusCode.Conflict,
                 _ => HttpStatusCode.BadRequest
             };
         }

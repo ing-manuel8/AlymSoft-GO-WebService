@@ -148,7 +148,7 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             if (Enum.TryParse<ResponseCode>(responseCodeStr, true, out var parsed))
                 return parsed;
 
-            return ResponseCode.UnexpectedError;
+            return ResponseCode.ValidationFailed;
         }
 
         private static void ThrowAppropriateException(ResponseCode code, StatusInfo status, string spName)
@@ -162,7 +162,8 @@ namespace AlymSoftGo.Infrastructure.DataAccess
                 );
             }
 
-            throw new SPBusinessException(code, status.ResponseCode);
+            var errorMessage = !string.IsNullOrEmpty(status.ErrorDescription) ? status.ErrorDescription : status.ResponseCode;
+            throw new SPBusinessException(code, status.ResponseCode, errorMessage, status.ResponseType);
         }
 
         private class StatusInfo

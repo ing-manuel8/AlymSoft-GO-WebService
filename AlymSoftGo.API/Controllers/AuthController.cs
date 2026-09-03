@@ -7,11 +7,11 @@ namespace AlymSoftGo.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LoginController : BaseController
+    public class AuthController : BaseController
     {
         private readonly IAuthService _authService;
 
-        public LoginController(IAuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
@@ -19,11 +19,22 @@ namespace AlymSoftGo.API.Controllers
         /// <summary>
         /// Authenticate user and return AccessToken and RefreshToken
         /// </summary>
-        [HttpPost]
+        [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             var response = await _authService.LoginAsync(request);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Register a new account and company
+        /// </summary>
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
+        {
+            var response = await _authService.RegisterAsync(request);
             return Ok(response);
         }
 

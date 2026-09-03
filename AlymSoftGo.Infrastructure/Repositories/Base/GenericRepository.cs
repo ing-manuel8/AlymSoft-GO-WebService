@@ -11,6 +11,7 @@ namespace AlymSoftGo.Infrastructure.Repositories.Base
         private static readonly string[] RepositorySuffixes = ["Repository", "Repo"];
         protected readonly IDataAccess _dataAccess;
         private string? _entityName;
+        protected virtual string DatabaseName => "AlymSoftGo";
 
         protected GenericRepository(IDataAccess dataAccess)
         {
@@ -54,6 +55,6 @@ namespace AlymSoftGo.Infrastructure.Repositories.Base
         protected async Task<TData> ResolveSpAsync<TData>(Dictionary<string, object>? @params = null, [CallerMemberName] string methodName = "") where TData : class, new()
             => await _dataAccess.ExecuteSpAsync<TData>(Sp(methodName), @params);
 
-        protected string Sp(string methodName) => $"spr_{EntityName}_{methodName.Replace("Async", string.Empty)}";
+        protected string Sp(string methodName) => $"spr_{DatabaseName}_{EntityName}_{methodName.Replace("Async", string.Empty)}";
     }
 }

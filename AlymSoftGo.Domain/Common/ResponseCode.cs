@@ -18,6 +18,9 @@ namespace AlymSoftGo.Domain.Common
         CompanyNotFound = 14,
         BranchNotFound = 15,
         OrderNotFound = 16,
-        InsufficientStock = 17
+        InsufficientStock = 17,
+        InvalidPhone = 18,
+        InvalidRefreshToken = 19,
+        EmailAlreadyExists = 20
     }
 }
