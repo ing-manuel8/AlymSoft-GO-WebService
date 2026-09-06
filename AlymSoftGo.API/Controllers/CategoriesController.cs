@@ -23,7 +23,7 @@ namespace AlymSoftGo.API.Controllers
             {
                 CompanyId = companyId
             };
-            var response = await _categoryService.GetCategoriesAsync<JArray>(@params);
+            var response = await _categoryService.GetCategoriesAsync<List<CategoryDto>>(@params);
             return HandleResponse(response);
         }
 

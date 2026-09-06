@@ -69,6 +69,7 @@ namespace AlymSoftGo.Domain.Params.Product
         public string? SaleTag { get; set; }
 
         [JsonProperty("@vUser")]
-        public string? User { get; set; } = "SYSTEM";
+        [Required]
+        public string User { get; set; } = "SYSTEM";
     }
 }

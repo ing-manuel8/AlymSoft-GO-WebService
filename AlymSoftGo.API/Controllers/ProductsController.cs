@@ -32,7 +32,7 @@ namespace AlymSoftGo.API.Controllers
                 BranchId = branchId ?? idSucursal,
                 SearchText = search
             };
-            var response = await _productService.GetProductsAsync<JArray>(@params);
+            var response = await _productService.GetProductsAsync<List<ProductDto>>(@params);
             return HandleResponse(response);
         }
 
@@ -47,7 +47,7 @@ namespace AlymSoftGo.API.Controllers
                 ProductId = productId,
                 BranchId = branchId ?? idSucursal
             };
-            var response = await _productService.GetProductByIdAsync<JObject>(@params);
+            var response = await _productService.GetProductByIdAsync<ProductDto>(@params);
             return HandleResponse(response);
         }
 
@@ -55,30 +55,7 @@ namespace AlymSoftGo.API.Controllers
         [Authorize]
         public async Task<IActionResult> SaveProduct([FromBody] SaveProductRequestDto request)
         {
-            var @params = new SaveProductParams
-            {
-                ProductId = request.ProductId,
-                CompanyId = request.CompanyId,
-                BranchId = request.BranchId,
-                CategoryId = request.CategoryId,
-                ProductTypeId = request.ProductTypeId,
-                UnitTypeId = request.UnitTypeId,
-                Sku = request.Sku,
-                Barcode = request.Barcode,
-                Name = request.Name,
-                Description = request.Description,
-                ImagesJson = request.ImagesJson,
-                Cost = request.Cost,
-                Price = request.Price,
-                OfferPrice = request.OfferPrice,
-                TrackStock = request.TrackStock,
-                Stock = request.Stock,
-                MinStock = request.MinStock,
-                IsOnSale = request.IsOnSale,
-                SaleTag = request.SaleTag,
-                User = !string.IsNullOrEmpty(request.User) && request.User != "SYSTEM" ? request.User : CurrentUserIdentifier
-            };
-            var response = await _productService.SaveProductAsync(@params);
+            var response = await _productService.SaveProductAsync(request, CurrentUserIdentifier);
             return HandleResponse(response);
         }
 
@@ -86,13 +63,7 @@ namespace AlymSoftGo.API.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteProduct(int productId, int companyId)
         {
-            var @params = new DeleteProductParams
-            {
-                ProductId = productId,
-                CompanyId = companyId,
-                UpdatedUser = CurrentUserIdentifier
-            };
-            var response = await _productService.DeleteProductAsync(@params);
+            var response = await _productService.DeleteProductAsync(productId, companyId, CurrentUserIdentifier);
             return HandleResponse(response);
         }
     }
