@@ -1,6 +1,8 @@
 using System.Net;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using AlymSoftGo.Domain.Common;
 using AlymSoftGo.Domain.DTOs;
@@ -57,6 +59,22 @@ namespace AlymSoftGo.Infrastructure.Middleware
                     statusCode = HttpStatusCode.InternalServerError;
                     break;
 
+                case SqlException sqlEx when sqlEx.Number == 2812 || (sqlEx.Message != null && sqlEx.Message.Contains("Could not find stored procedure", StringComparison.OrdinalIgnoreCase)):
+                    response.ResponseType = 2;
+                    response.ResponseCode = "STORED_PROCEDURE_NOT_FOUND";
+                    response.Message = sqlEx.Message;
+                    response.Details = new { errorNumber = sqlEx.Number, procedure = sqlEx.Procedure };
+                    statusCode = HttpStatusCode.InternalServerError;
+                    break;
+
+                case SqlException sqlEx:
+                    response.ResponseType = 2;
+                    response.ResponseCode = "DATABASE_ERROR";
+                    response.Message = sqlEx.Message;
+                    response.Details = new { errorNumber = sqlEx.Number };
+                    statusCode = HttpStatusCode.InternalServerError;
+                    break;
+
                 case UnauthorizedAccessException:
                     response.ResponseType = 3;
                     response.ResponseCode = "Unauthorized";
@@ -73,7 +91,11 @@ namespace AlymSoftGo.Infrastructure.Middleware
             }
 
             context.Response.StatusCode = (int)statusCode;
-            var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var jsonOptions = new JsonSerializerOptions 
+            { 
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
             var jsonResponse = JsonSerializer.Serialize(response, jsonOptions);
 
             await context.Response.WriteAsync(jsonResponse);

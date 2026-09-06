@@ -84,7 +84,8 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             {
                 foreach (var param in @params)
                 {
-                    command.Parameters.AddWithValue($"@{param.Key}", param.Value ?? DBNull.Value);
+                    var paramName = param.Key.StartsWith("@") ? param.Key : $"@{param.Key}";
+                    command.Parameters.AddWithValue(paramName, param.Value ?? DBNull.Value);
                 }
             }
 

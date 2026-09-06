@@ -1,6 +1,7 @@
 using AlymSoftGo.Domain.DTOs;
 using AlymSoftGo.Domain.Interfaces.Persistence;
 using AlymSoftGo.Domain.Interfaces.Repositories;
+using AlymSoftGo.Domain.Params.Category;
 using AlymSoftGo.Infrastructure.Repositories.Base;
 
 namespace AlymSoftGo.Infrastructure.Repositories
@@ -11,26 +12,19 @@ namespace AlymSoftGo.Infrastructure.Repositories
         {
         }
 
-        public async Task<TData> GetCategoriesByCompanyAsync<TData>(int idEmpresa) where TData : class, new()
+        public async Task<TData> GetCategoriesByCompanyAsync<TData>(GetCategoriesParams @params) where TData : class, new()
         {
-            return await ResolveSpAsync<TData>(new Dictionary<string, object> { { "idEmpresa", idEmpresa } });
+            return await ResolveSpAsync<TData>(@params);
         }
 
-        public async Task<EmptyDto> SaveCategoryAsync(object @params)
+        public async Task<EmptyDto> SaveCategoryAsync(SaveCategoryParams @params)
         {
             return await ResolveSpAsync<EmptyDto>(@params);
         }
 
-        public async Task<EmptyDto> DeleteCategoryAsync(int idCategoria, int idEmpresa, string vUpdatedUser)
+        public async Task<EmptyDto> DeleteCategoryAsync(DeleteCategoryParams @params)
         {
-            var parameters = new Dictionary<string, object>
-            {
-                { "idCategoria", idCategoria },
-                { "idEmpresa", idEmpresa },
-                { "vUpdatedUser", vUpdatedUser }
-            };
-
-            return await ResolveSpAsync<EmptyDto>(parameters);
+            return await ResolveSpAsync<EmptyDto>(@params);
         }
     }
 }

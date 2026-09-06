@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AlymSoftGo.Application.Interfaces;
+using AlymSoftGo.Domain.DTOs;
+using AlymSoftGo.Domain.Params.Category;
 using Newtonsoft.Json.Linq;
 
 namespace AlymSoftGo.API.Controllers
@@ -14,26 +16,44 @@ namespace AlymSoftGo.API.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpGet("company/{idEmpresa:int}")]
-        public async Task<IActionResult> GetCategories(int idEmpresa)
+        [HttpGet("company/{companyId:int}")]
+        public async Task<IActionResult> GetCategories(int companyId)
         {
-            var response = await _categoryService.GetCategoriesAsync<JArray>(idEmpresa);
+            var @params = new GetCategoriesParams
+            {
+                CompanyId = companyId
+            };
+            var response = await _categoryService.GetCategoriesAsync<JArray>(@params);
             return HandleResponse(response);
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> SaveCategory([FromBody] object categoryParams)
+        public async Task<IActionResult> SaveCategory([FromBody] SaveCategoryRequestDto request)
         {
-            var response = await _categoryService.SaveCategoryAsync(categoryParams);
+            var @params = new SaveCategoryParams
+            {
+                CategoryId = request.CategoryId,
+                CompanyId = request.CompanyId,
+                Name = request.Name,
+                Description = request.Description,
+                User = !string.IsNullOrEmpty(request.User) && request.User != "SYSTEM" ? request.User : CurrentUserIdentifier
+            };
+            var response = await _categoryService.SaveCategoryAsync(@params);
             return HandleResponse(response);
         }
 
-        [HttpDelete("{idCategoria:int}/company/{idEmpresa:int}")]
+        [HttpDelete("{categoryId:int}/company/{companyId:int}")]
         [Authorize]
-        public async Task<IActionResult> DeleteCategory(int idCategoria, int idEmpresa)
+        public async Task<IActionResult> DeleteCategory(int categoryId, int companyId)
         {
-            var response = await _categoryService.DeleteCategoryAsync(idCategoria, idEmpresa, CurrentUserIdentifier);
+            var @params = new DeleteCategoryParams
+            {
+                CategoryId = categoryId,
+                CompanyId = companyId,
+                UpdatedUser = CurrentUserIdentifier
+            };
+            var response = await _categoryService.DeleteCategoryAsync(@params);
             return HandleResponse(response);
         }
     }

@@ -21,6 +21,7 @@ namespace AlymSoftGo.Domain.Common
         InsufficientStock = 17,
         InvalidPhone = 18,
         InvalidRefreshToken = 19,
-        EmailAlreadyExists = 20
+        EmailAlreadyExists = 20,
+        StoredProcedureNotFound = 21
     }
 }

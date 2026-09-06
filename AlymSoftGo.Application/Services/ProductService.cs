@@ -2,6 +2,7 @@ using AlymSoftGo.Application.Interfaces;
 using AlymSoftGo.Domain.Common;
 using AlymSoftGo.Domain.DTOs;
 using AlymSoftGo.Domain.Interfaces.Repositories;
+using AlymSoftGo.Domain.Params.Product;
 
 namespace AlymSoftGo.Application.Services
 {
@@ -14,28 +15,28 @@ namespace AlymSoftGo.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<RepositoryResponse<TData>> GetProductsAsync<TData>(int idEmpresa, int? idCategoria = null, int? idSucursal = null) where TData : class, new()
+        public async Task<RepositoryResponse<TData>> GetProductsAsync<TData>(GetProductsParams @params) where TData : class, new()
         {
-            var data = await _productRepository.GetProductsByCompanyAsync<TData>(idEmpresa, idCategoria, idSucursal);
+            var data = await _productRepository.GetProductsByCompanyAsync<TData>(@params);
             return RepositoryResponse<TData>.FromSuccess(data);
         }
 
-        public async Task<RepositoryResponse<TData>> GetProductByIdAsync<TData>(int idProducto, int? idSucursal = null) where TData : class, new()
+        public async Task<RepositoryResponse<TData>> GetProductByIdAsync<TData>(GetProductByIdParams @params) where TData : class, new()
         {
-            var data = await _productRepository.GetProductByIdAsync<TData>(idProducto, idSucursal);
+            var data = await _productRepository.GetProductByIdAsync<TData>(@params);
             return RepositoryResponse<TData>.FromSuccess(data);
         }
 
-        public async Task<RepositoryResponse<EmptyDto>> SaveProductAsync(object @params)
+        public async Task<RepositoryResponse<EmptyDto>> SaveProductAsync(SaveProductParams @params)
         {
             var result = await _productRepository.SaveProductAsync(@params);
-            return RepositoryResponse<EmptyDto>.FromSuccess(result, "Product saved successfully.");
+            return RepositoryResponse<EmptyDto>.FromSuccess(result);
         }
 
-        public async Task<RepositoryResponse<EmptyDto>> DeleteProductAsync(int idProducto, int idEmpresa, string vUpdatedUser)
+        public async Task<RepositoryResponse<EmptyDto>> DeleteProductAsync(DeleteProductParams @params)
         {
-            var result = await _productRepository.DeleteProductAsync(idProducto, idEmpresa, vUpdatedUser);
-            return RepositoryResponse<EmptyDto>.FromSuccess(result, "Product deleted successfully.");
+            var result = await _productRepository.DeleteProductAsync(@params);
+            return RepositoryResponse<EmptyDto>.FromSuccess(result);
         }
     }
 }

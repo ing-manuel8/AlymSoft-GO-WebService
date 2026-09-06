@@ -1,6 +1,7 @@
 using AlymSoftGo.Domain.DTOs;
 using AlymSoftGo.Domain.Interfaces.Persistence;
 using AlymSoftGo.Domain.Interfaces.Repositories;
+using AlymSoftGo.Domain.Params.Product;
 using AlymSoftGo.Infrastructure.Repositories.Base;
 
 namespace AlymSoftGo.Infrastructure.Repositories
@@ -11,46 +12,24 @@ namespace AlymSoftGo.Infrastructure.Repositories
         {
         }
 
-        public async Task<TData> GetProductsByCompanyAsync<TData>(int idEmpresa, int? idCategoria = null, int? idSucursal = null) where TData : class, new()
+        public async Task<TData> GetProductsByCompanyAsync<TData>(GetProductsParams @params) where TData : class, new()
         {
-            var parameters = new Dictionary<string, object>
-            {
-                { "idEmpresa", idEmpresa }
-            };
-
-            if (idCategoria.HasValue) parameters["idCategoria"] = idCategoria.Value;
-            if (idSucursal.HasValue) parameters["idSucursal"] = idSucursal.Value;
-
-            return await ResolveSpAsync<TData>(parameters);
+            return await ResolveSpAsync<TData>(@params);
         }
 
-        public async Task<TData> GetProductByIdAsync<TData>(int idProducto, int? idSucursal = null) where TData : class, new()
+        public async Task<TData> GetProductByIdAsync<TData>(GetProductByIdParams @params) where TData : class, new()
         {
-            var parameters = new Dictionary<string, object>
-            {
-                { "idProducto", idProducto }
-            };
-
-            if (idSucursal.HasValue) parameters["idSucursal"] = idSucursal.Value;
-
-            return await ResolveSpAsync<TData>(parameters);
+            return await ResolveSpAsync<TData>(@params);
         }
 
-        public async Task<EmptyDto> SaveProductAsync(object @params)
+        public async Task<EmptyDto> SaveProductAsync(SaveProductParams @params)
         {
             return await ResolveSpAsync<EmptyDto>(@params);
         }
 
-        public async Task<EmptyDto> DeleteProductAsync(int idProducto, int idEmpresa, string vUpdatedUser)
+        public async Task<EmptyDto> DeleteProductAsync(DeleteProductParams @params)
         {
-            var parameters = new Dictionary<string, object>
-            {
-                { "idProducto", idProducto },
-                { "idEmpresa", idEmpresa },
-                { "vUpdatedUser", vUpdatedUser }
-            };
-
-            return await ResolveSpAsync<EmptyDto>(parameters);
+            return await ResolveSpAsync<EmptyDto>(@params);
         }
     }
 }
