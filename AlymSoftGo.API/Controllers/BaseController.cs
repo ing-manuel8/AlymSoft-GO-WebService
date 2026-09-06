@@ -11,7 +11,7 @@ namespace AlymSoftGo.API.Controllers
         {
             get
             {
-                var claim = User.FindFirst("idEmpresa");
+                var claim = User.FindFirst("companyId") ?? User.FindFirst("idEmpresa");
                 return claim != null && int.TryParse(claim.Value, out var id) ? id : 0;
             }
         }
@@ -20,7 +20,7 @@ namespace AlymSoftGo.API.Controllers
         {
             get
             {
-                var claim = User.FindFirst("sub") ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                var claim = User.FindFirst("email") ?? User.FindFirst("sub") ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
                 return claim?.Value ?? "SYSTEM";
             }
         }

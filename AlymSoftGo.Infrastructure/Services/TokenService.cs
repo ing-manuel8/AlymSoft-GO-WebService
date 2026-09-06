@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using AlymSoftGo.Domain.DTOs;
 using AlymSoftGo.Domain.Interfaces.Services;
 
 namespace AlymSoftGo.Infrastructure.Services
@@ -17,31 +18,54 @@ namespace AlymSoftGo.Infrastructure.Services
             _configuration = configuration;
         }
 
-        public (string AccessToken, string RefreshToken) GenerateTokenPair(int companyId, string userIdentifier, IEnumerable<Claim>? additionalClaims = null)
+        public (string AccessToken, string RefreshToken) GenerateTokenPair(UserDto user)
         {
-            var accessToken = GenerateAccessToken(companyId, userIdentifier, additionalClaims);
+            var accessToken = GenerateAccessToken(user);
             var refreshToken = GenerateRefreshToken();
             return (accessToken, refreshToken);
         }
 
-        public string GenerateAccessToken(int companyId, string userIdentifier, IEnumerable<Claim>? additionalClaims = null)
+        public (string AccessToken, string RefreshToken) GenerateTokenPair(IEnumerable<Claim> claims)
+        {
+            var accessToken = GenerateAccessToken(claims);
+            var refreshToken = GenerateRefreshToken();
+            return (accessToken, refreshToken);
+        }
+
+        public string GenerateAccessToken(UserDto user)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.Email),
+                new("sub", user.Email),
+                new("companyId", user.CompanyId.ToString()),
+                new("idEmpresa", user.CompanyId.ToString()),
+                new("userId", user.UserId.ToString()),
+                new("companyName", user.CompanyName ?? string.Empty),
+                new("currency", user.Currency ?? "USD"),
+                new("email", user.Email ?? string.Empty),
+                new("firstName", user.FirstName ?? string.Empty),
+                new("lastName", user.LastName ?? string.Empty),
+                new("phone", user.Phone ?? string.Empty),
+                new("isSuperAdmin", user.IsSuperAdmin.ToString())
+            };
+
+            if (user.BranchId.HasValue) claims.Add(new("branchId", user.BranchId.Value.ToString()));
+            if (!string.IsNullOrEmpty(user.BranchName)) claims.Add(new("branchName", user.BranchName));
+            if (!string.IsNullOrEmpty(user.TimeZone)) claims.Add(new("timeZone", user.TimeZone));
+            if (!string.IsNullOrEmpty(user.TimeZoneIANA)) claims.Add(new("timeZoneIANA", user.TimeZoneIANA));
+            if (user.RoleId.HasValue) claims.Add(new("roleId", user.RoleId.Value.ToString()));
+            if (!string.IsNullOrEmpty(user.RoleName)) claims.Add(new("roleName", user.RoleName));
+            if (!string.IsNullOrEmpty(user.Permissions)) claims.Add(new("permissions", user.Permissions));
+
+            return GenerateAccessToken(claims);
+        }
+
+        public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"] 
                 ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured.");
-
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, userIdentifier),
-                new("sub", userIdentifier),
-                new("companyId", companyId.ToString()),
-                new("idEmpresa", companyId.ToString())
-            };
-
-            if (additionalClaims != null)
-            {
-                claims.AddRange(additionalClaims);
-            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

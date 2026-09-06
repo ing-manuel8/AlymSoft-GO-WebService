@@ -31,10 +31,10 @@ namespace AlymSoftGo.Infrastructure.DataAccess
         public async Task<TData> ExecuteSpAsync<TData>(string spName, Dictionary<string, object>? @params = null) where TData : class, new()
         {
             var (statusInfo, allDataSets) = await ExecuteSpInternalAsync(spName, @params);
-            var mappedCode = MapSpStatusToEnum(statusInfo.ResponseCode);
+            var mappedCode = MapSpStatusToEnum(statusInfo.ResponseCode, statusInfo.ErrorDescription);
 
             // Validaciones de negocio (ResponseType = 3) o Errores inesperados (ResponseType = 2)
-            if (mappedCode != ResponseCode.Ok)
+            if (statusInfo.ResponseType != 1 || mappedCode != ResponseCode.Ok)
             {
                 ThrowAppropriateException(mappedCode, statusInfo, spName);
             }
@@ -97,13 +97,13 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             // 1er SELECT: ResponseType y ResponseCode
             if (await reader.ReadAsync())
             {
-                statusInfo.ResponseType = reader.IsDBNull(reader.GetOrdinal("ResponseType")) ? 1 : Convert.ToInt32(reader["ResponseType"]);
-                statusInfo.ResponseCode = reader.IsDBNull(reader.GetOrdinal("ResponseCode")) ? "Ok" : reader["ResponseCode"].ToString() ?? "Ok";
+                statusInfo.ResponseType = Convert.ToInt32(reader["ResponseType"]);
+                statusInfo.ResponseCode = reader["ResponseCode"].ToString()!;
                 
-                if (HasColumn(reader, "ErrorTitle") && !reader.IsDBNull(reader.GetOrdinal("ErrorTitle")))
+                if (HasColumn(reader, "ErrorTitle") && reader["ErrorTitle"] != DBNull.Value)
                     statusInfo.ErrorTitle = reader["ErrorTitle"].ToString();
                 
-                if (HasColumn(reader, "ErrorDescription") && !reader.IsDBNull(reader.GetOrdinal("ErrorDescription")))
+                if (HasColumn(reader, "ErrorDescription") && reader["ErrorDescription"] != DBNull.Value)
                     statusInfo.ErrorDescription = reader["ErrorDescription"].ToString();
             }
 
@@ -140,13 +140,21 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             return false;
         }
 
-        private static ResponseCode MapSpStatusToEnum(string responseCodeStr)
+        private static ResponseCode MapSpStatusToEnum(string responseCodeStr, string? errorDesc = null)
         {
             if (string.IsNullOrWhiteSpace(responseCodeStr) || responseCodeStr.Equals("Ok", StringComparison.OrdinalIgnoreCase))
                 return ResponseCode.Ok;
 
-            if (Enum.TryParse<ResponseCode>(responseCodeStr, true, out var parsed))
+            var cleanedCode = responseCodeStr.Replace("_", "");
+            if (Enum.TryParse<ResponseCode>(cleanedCode, true, out var parsed))
                 return parsed;
+
+            if (!string.IsNullOrWhiteSpace(errorDesc))
+            {
+                var cleanedDesc = errorDesc.Replace("_", "");
+                if (Enum.TryParse<ResponseCode>(cleanedDesc, true, out var parsedDesc))
+                    return parsedDesc;
+            }
 
             return ResponseCode.ValidationFailed;
         }
@@ -162,8 +170,12 @@ namespace AlymSoftGo.Infrastructure.DataAccess
                 );
             }
 
+            var errorCode = !string.IsNullOrEmpty(status.ErrorDescription) && !status.ErrorDescription.Contains(' ')
+                ? status.ErrorDescription
+                : status.ResponseCode;
+
             var errorMessage = !string.IsNullOrEmpty(status.ErrorDescription) ? status.ErrorDescription : status.ResponseCode;
-            throw new SPBusinessException(code, status.ResponseCode, errorMessage, status.ResponseType);
+            throw new SPBusinessException(code, errorCode, errorMessage, status.ResponseType);
         }
 
         private class StatusInfo

@@ -4,9 +4,9 @@ namespace AlymSoftGo.Application.Interfaces
 {
     public interface IAuthService
     {
-        Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
-        Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request);
-        Task<RefreshTokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto request);
+        Task<(UserDto User, string AccessToken, string RefreshToken)> LoginAsync(LoginRequestDto request);
+        Task<(UserDto User, string AccessToken, string RefreshToken)> RegisterAsync(RegisterRequestDto request);
+        Task<(UserDto User, string AccessToken, string RefreshToken)> RefreshTokenAsync(string refreshToken);
         Task<EmptyDto> RevokeTokenAsync(string refreshToken, string userIdentifier);
     }
 }

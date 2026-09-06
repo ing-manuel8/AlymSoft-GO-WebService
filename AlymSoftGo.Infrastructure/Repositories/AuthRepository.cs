@@ -11,14 +11,14 @@ namespace AlymSoftGo.Infrastructure.Repositories
         {
         }
 
-        public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
+        public async Task<UserDto> LoginAsync(LoginRequestDto request)
         {
-            return await ResolveSpAsync<LoginResponseDto>(request);
+            return await ResolveSpAsync<UserDto>(request);
         }
 
-        public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
+        public async Task<UserDto> RegisterAsync(RegisterRequestDto request)
         {
-            return await ResolveSpAsync<RegisterResponseDto>(request);
+            return await ResolveSpAsync<UserDto>(request);
         }
 
         public async Task<EmptyDto> SaveRefreshTokenAsync(int companyId, string email, string refreshToken, DateTime expirationDate)
@@ -34,14 +34,14 @@ namespace AlymSoftGo.Infrastructure.Repositories
             return await ResolveSpAsync<EmptyDto>(parameters);
         }
 
-        public async Task<LoginResponseDto> ValidateRefreshTokenAsync(string refreshToken)
+        public async Task<UserDto> ValidateRefreshTokenAsync(string refreshToken)
         {
             var parameters = new Dictionary<string, object>
             {
                 { "vRefreshToken", refreshToken }
             };
 
-            return await ResolveSpAsync<LoginResponseDto>(parameters);
+            return await ResolveSpAsync<UserDto>(parameters);
         }
 
         public async Task<EmptyDto> RevokeRefreshTokenAsync(string refreshToken, string updatedUser)
