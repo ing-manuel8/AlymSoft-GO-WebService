@@ -28,6 +28,38 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             await ExecuteSpAsync<EmptyDto>(spName, @params);
         }
 
+        public async Task<(T1 Data1, T2 Data2)> ExecuteSpAsync<T1, T2>(string spName, Dictionary<string, object>? @params = null)
+            where T1 : class, new()
+            where T2 : class, new()
+        {
+            var (statusInfo, allDataSets) = await ExecuteSpInternalAsync(spName, @params);
+            var mappedCode = MapSpStatusToEnum(statusInfo.ResponseCode, statusInfo.ErrorDescription);
+
+            if (statusInfo.ResponseType != 1 || mappedCode != ResponseCode.Ok)
+            {
+                ThrowAppropriateException(mappedCode, statusInfo, spName);
+            }
+
+            var json = JsonConvert.SerializeObject(allDataSets);
+            var jsonObject = JObject.Parse(json);
+
+            T1? data1 = default;
+            if (allDataSets.ContainsKey("table1"))
+            {
+                var table1Json = jsonObject["table1"] as JArray;
+                data1 = table1Json?.ToObject<T1>();
+            }
+
+            T2? data2 = default;
+            if (allDataSets.ContainsKey("table2"))
+            {
+                var table2Json = jsonObject["table2"] as JArray;
+                data2 = table2Json?.ToObject<T2>();
+            }
+
+            return (data1 ?? new T1(), data2 ?? new T2());
+        }
+
         public async Task<TData> ExecuteSpAsync<TData>(string spName, Dictionary<string, object>? @params = null) where TData : class, new()
         {
             var (statusInfo, allDataSets) = await ExecuteSpInternalAsync(spName, @params);

@@ -109,6 +109,7 @@ builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+builder.Services.AddScoped<IModifierRepository, ModifierRepository>();
 
 // Servicios de Aplicación
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -117,6 +118,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IModifierService, ModifierService>();
 
 // 5. Configuración de CORS
 builder.Services.AddCors(options =>

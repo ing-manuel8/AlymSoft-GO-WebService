@@ -23,9 +23,6 @@ namespace AlymSoftGo.Domain.Params.Customer
         [Required]
         public string Phone { get; set; } = string.Empty;
 
-        [JsonProperty("@vEmail")]
-        public string? Email { get; set; }
-
         [JsonProperty("@vDireccionPredeterminada")]
         public string? DefaultAddress { get; set; }
 

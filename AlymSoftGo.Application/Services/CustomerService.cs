@@ -51,7 +51,6 @@ namespace AlymSoftGo.Application.Services
                 CompanyId = _userContext.GetCompanyId(),
                 FullName = request.FullName.Trim(),
                 Phone = request.Phone.Trim(),
-                Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
                 DefaultAddress = string.IsNullOrWhiteSpace(request.DefaultAddress) ? null : request.DefaultAddress.Trim(),
                 Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
                 User = _userContext.GetUserIdentifier()
