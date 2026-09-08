@@ -55,15 +55,16 @@ namespace AlymSoftGo.API.Controllers
         [Authorize]
         public async Task<IActionResult> SaveProduct([FromBody] SaveProductRequestDto request)
         {
-            var response = await _productService.SaveProductAsync(request, CurrentUserIdentifier);
+            var response = await _productService.SaveProductAsync(request);
             return HandleResponse(response);
         }
 
+        [HttpDelete("{productId:int}")]
         [HttpDelete("{productId:int}/company/{companyId:int}")]
         [Authorize]
-        public async Task<IActionResult> DeleteProduct(int productId, int companyId)
+        public async Task<IActionResult> DeleteProduct(int productId, [FromRoute] int? companyId = null)
         {
-            var response = await _productService.DeleteProductAsync(productId, companyId, CurrentUserIdentifier);
+            var response = await _productService.DeleteProductAsync(productId, companyId ?? 0);
             return HandleResponse(response);
         }
     }

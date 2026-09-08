@@ -95,8 +95,10 @@ builder.Services.AddAuthorization();
 
 // 4. Inyección de Dependencias
 // Data Access y Servicios Base
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IDataAccess, DataAccess>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 
 // Repositorios
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -105,12 +107,16 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
 
 // Servicios de Aplicación
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 // 5. Configuración de CORS
 builder.Services.AddCors(options =>
@@ -135,7 +141,7 @@ if (app.Environment.IsDevelopment() || true)
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlymSoft-Go API v1");
-        c.RoutePrefix = string.Empty; // Carga Swagger en la raíz
+        c.RoutePrefix = string.Empty;
     });
 }
 

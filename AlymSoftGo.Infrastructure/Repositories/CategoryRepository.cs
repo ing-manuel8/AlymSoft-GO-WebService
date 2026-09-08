@@ -12,17 +12,17 @@ namespace AlymSoftGo.Infrastructure.Repositories
         {
         }
 
-        public async Task<TData> GetCategoriesByCompanyAsync<TData>(GetCategoriesParams @params) where TData : class, new()
+        public async Task<TData> GetByCompanyAsync<TData>(GetCategoriesParams @params) where TData : class, new()
         {
             return await ResolveSpAsync<TData>(@params);
         }
 
-        public async Task<EmptyDto> SaveCategoryAsync(SaveCategoryParams @params)
+        public async Task<EmptyDto> SaveAsync(SaveCategoryParams @params)
         {
             return await ResolveSpAsync<EmptyDto>(@params);
         }
 
-        public async Task<EmptyDto> DeleteCategoryAsync(DeleteCategoryParams @params)
+        public async Task<EmptyDto> DeleteAsync(DeleteCategoryParams @params)
         {
             return await ResolveSpAsync<EmptyDto>(@params);
         }

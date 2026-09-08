@@ -16,7 +16,9 @@ namespace AlymSoftGo.Domain.Params.Category
         [Required]
         public int CompanyId { get; set; }
 
-        [JsonProperty("@vUpdatedUser")]
-        public string? UpdatedUser { get; set; } = "SYSTEM";
+        [JsonProperty("@vUser")]
+        public string? User { get; set; } = "SYSTEM";
+
+        public string? UpdatedUser { get => User; set => User = value; }
     }
 }

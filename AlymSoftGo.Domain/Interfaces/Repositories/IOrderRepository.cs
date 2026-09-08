@@ -1,12 +1,13 @@
 using AlymSoftGo.Domain.DTOs;
+using AlymSoftGo.Domain.Params.Order;
 
 namespace AlymSoftGo.Domain.Interfaces.Repositories
 {
     public interface IOrderRepository
     {
-        Task<TData> GetOrdersByCompanyAsync<TData>(int idEmpresa, int? idSucursal = null, int? idCatEstadoPedido = null) where TData : class, new();
-        Task<TData> GetOrderByIdAsync<TData>(int idPedido) where TData : class, new();
-        Task<TData> CreateOrderAsync<TData>(object @params) where TData : class, new();
-        Task<EmptyDto> UpdateOrderStatusAsync(object @params);
+        Task<TData> GetOrdersByCompanyAsync<TData>(GetOrdersByCompanyParams @params) where TData : class, new();
+        Task<TData> GetOrderByIdAsync<TData>(GetOrderByIdParams @params) where TData : class, new();
+        Task<TData> CreateOrderAsync<TData>(CreateOrderParams @params) where TData : class, new();
+        Task<EmptyDto> UpdateOrderStatusAsync(UpdateOrderStatusParams @params);
     }
 }

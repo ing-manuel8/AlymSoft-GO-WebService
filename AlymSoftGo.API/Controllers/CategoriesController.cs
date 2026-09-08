@@ -2,8 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AlymSoftGo.Application.Interfaces;
 using AlymSoftGo.Domain.DTOs;
-using AlymSoftGo.Domain.Params.Category;
-using Newtonsoft.Json.Linq;
+using AlymSoftGo.Domain.DTOs.Category;
 
 namespace AlymSoftGo.API.Controllers
 {
@@ -16,14 +15,11 @@ namespace AlymSoftGo.API.Controllers
             _categoryService = categoryService;
         }
 
+        [HttpGet]
         [HttpGet("company/{companyId:int}")]
-        public async Task<IActionResult> GetCategories(int companyId)
+        public async Task<IActionResult> GetCategories()
         {
-            var @params = new GetCategoriesParams
-            {
-                CompanyId = companyId
-            };
-            var response = await _categoryService.GetCategoriesAsync<List<CategoryDto>>(@params);
+            var response = await _categoryService.GetCategoriesAsync<List<CategoryDto>>();
             return HandleResponse(response);
         }
 
@@ -31,30 +27,18 @@ namespace AlymSoftGo.API.Controllers
         [Authorize]
         public async Task<IActionResult> SaveCategory([FromBody] SaveCategoryRequestDto request)
         {
-            var @params = new SaveCategoryParams
-            {
-                CategoryId = request.CategoryId,
-                CompanyId = request.CompanyId,
-                Name = request.Name,
-                Description = request.Description,
-                User = !string.IsNullOrEmpty(request.User) && request.User != "SYSTEM" ? request.User : CurrentUserIdentifier
-            };
-            var response = await _categoryService.SaveCategoryAsync(@params);
+            var response = await _categoryService.SaveCategoryAsync(request);
             return HandleResponse(response);
         }
 
+        [HttpDelete("{categoryId:int}")]
         [HttpDelete("{categoryId:int}/company/{companyId:int}")]
         [Authorize]
-        public async Task<IActionResult> DeleteCategory(int categoryId, int companyId)
+        public async Task<IActionResult> DeleteCategory(int categoryId)
         {
-            var @params = new DeleteCategoryParams
-            {
-                CategoryId = categoryId,
-                CompanyId = companyId,
-                UpdatedUser = CurrentUserIdentifier
-            };
-            var response = await _categoryService.DeleteCategoryAsync(@params);
+            var response = await _categoryService.DeleteCategoryAsync(categoryId);
             return HandleResponse(response);
         }
     }
 }
+

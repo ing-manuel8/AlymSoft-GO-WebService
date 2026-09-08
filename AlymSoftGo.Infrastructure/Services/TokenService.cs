@@ -46,6 +46,8 @@ namespace AlymSoftGo.Infrastructure.Services
                 new("email", user.Email ?? string.Empty),
                 new("firstName", user.FirstName ?? string.Empty),
                 new("lastName", user.LastName ?? string.Empty),
+                new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}".Trim()),
+                new("name", $"{user.FirstName} {user.LastName}".Trim()),
                 new("phone", user.Phone ?? string.Empty),
                 new("isSuperAdmin", user.IsSuperAdmin.ToString())
             };

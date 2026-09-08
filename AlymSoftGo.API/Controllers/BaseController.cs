@@ -29,15 +29,20 @@ namespace AlymSoftGo.API.Controllers
         {
             if (response.IsSuccess)
             {
-                return Ok(ApiResponse.Success(response.Data, response.Message));
+                return Ok(response.Data);
             }
 
-            return StatusCode(500, ApiResponse.Fail(response.ResponseCode, response.Message, 500, response.Errors));
+            return StatusCode(500, new
+            {
+                responseCode = response.ResponseCode.ToString(),
+                message = response.Message,
+                errors = response.Errors
+            });
         }
 
         protected IActionResult HandleSuccess(object? data = null, string message = "Operation successful")
         {
-            return Ok(ApiResponse.Success(data, message));
+            return Ok(data);
         }
     }
 }

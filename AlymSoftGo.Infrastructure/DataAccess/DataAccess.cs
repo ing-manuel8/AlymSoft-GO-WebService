@@ -61,6 +61,23 @@ namespace AlymSoftGo.Infrastructure.DataAccess
                 else
                     data = tableJson?[0]?.ToObject<TData>();
 
+                // Si existen tablas adicionales en el SP (ej. table2 para detalle de partidas)
+                if (data != null && allDataSets.ContainsKey("table2"))
+                {
+                    var table2Json = jsonObject["table2"] as JArray;
+                    if (table2Json != null && table2Json.Count > 0)
+                    {
+                        var listProp = typeof(TData).GetProperties()
+                            .FirstOrDefault(p => typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) 
+                                              && p.PropertyType != typeof(string));
+                        if (listProp != null && listProp.CanWrite)
+                        {
+                            var childList = table2Json.ToObject(listProp.PropertyType);
+                            listProp.SetValue(data, childList);
+                        }
+                    }
+                }
+
                 return data ?? new TData();
             }
             catch (Exception ex)
