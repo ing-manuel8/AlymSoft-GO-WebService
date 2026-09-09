@@ -38,6 +38,12 @@ namespace AlymSoftGo.Domain.DTOs.Branch
         public string TimeZoneIANA { get; set; } = "America/Mexico_City";
         public string? VTimeZoneIANA { set => TimeZoneIANA = value ?? "America/Mexico_City"; }
 
+        public string? Currency { get; set; }
+        public string? VCurrency { set => Currency = value; }
+
+        public string? Culture { get; set; }
+        public string? VCulture { set => Culture = value; }
+
         public bool IsActive { get; set; }
         public bool BIsActive { set => IsActive = value; }
     }

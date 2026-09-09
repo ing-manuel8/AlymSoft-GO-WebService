@@ -43,6 +43,7 @@ namespace AlymSoftGo.Infrastructure.Services
                 new("userId", user.UserId.ToString()),
                 new("companyName", user.CompanyName ?? string.Empty),
                 new("currency", user.Currency ?? "USD"),
+                new("culture", user.Culture ?? "es-MX"),
                 new("email", user.Email ?? string.Empty),
                 new("firstName", user.FirstName ?? string.Empty),
                 new("lastName", user.LastName ?? string.Empty),

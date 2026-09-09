@@ -68,6 +68,8 @@ namespace AlymSoftGo.Application.Services
                 AllowsPickup = request.AllowsPickup,
                 TimeZone = string.IsNullOrWhiteSpace(request.TimeZone) ? "Central Standard Time (Mexico)" : request.TimeZone.Trim(),
                 TimeZoneIANA = string.IsNullOrWhiteSpace(request.TimeZoneIANA) ? "America/Mexico_City" : request.TimeZoneIANA.Trim(),
+                Currency = string.IsNullOrWhiteSpace(request.Currency) ? null : request.Currency.Trim(),
+                Culture = string.IsNullOrWhiteSpace(request.Culture) ? null : request.Culture.Trim(),
                 User = _userContext.GetUserIdentifier()
             };
 

@@ -45,7 +45,6 @@ namespace AlymSoftGo.API.Controllers
         /// Refresh expired AccessToken using a valid RefreshToken
         /// </summary>
         [HttpPost("refresh")]
-        [HttpPost("refresh-token")]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto? request)
         {
@@ -66,11 +65,11 @@ namespace AlymSoftGo.API.Controllers
         }
 
         /// <summary>
-        /// Revoke RefreshToken (Logout)
+        /// Revoke RefreshToken and delete cookies (Logout)
         /// </summary>
-        [HttpPost("revoke")]
+        [HttpPost("logout")]
         [Authorize]
-        public async Task<IActionResult> RevokeToken([FromBody] RefreshTokenRequestDto? request)
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto? request)
         {
             var tokenStr = request?.RefreshToken;
             if (string.IsNullOrEmpty(tokenStr) && Request.Cookies.TryGetValue("refreshToken", out var cookieToken))
@@ -128,6 +127,7 @@ namespace AlymSoftGo.API.Controllers
                 CompanyId = CurrentCompanyId,
                 CompanyName = User.FindFirst("companyName")?.Value ?? string.Empty,
                 Currency = User.FindFirst("currency")?.Value ?? "USD",
+                Culture = User.FindFirst("culture")?.Value ?? "es-MX",
                 BranchId = int.TryParse(User.FindFirst("branchId")?.Value, out var bid) ? bid : null,
                 BranchName = User.FindFirst("branchName")?.Value,
                 TimeZone = User.FindFirst("timeZone")?.Value,

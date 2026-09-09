@@ -30,5 +30,11 @@ namespace AlymSoftGo.Domain.DTOs.Branch
         public string? TimeZone { get; set; }
 
         public string? TimeZoneIANA { get; set; }
+
+        [StringLength(10, ErrorMessage = "El código de moneda no puede exceder los 10 caracteres")]
+        public string? Currency { get; set; }
+
+        [StringLength(20, ErrorMessage = "La cultura/región no puede exceder los 20 caracteres")]
+        public string? Culture { get; set; }
     }
 }

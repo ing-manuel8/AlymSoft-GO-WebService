@@ -43,6 +43,12 @@ namespace AlymSoftGo.Domain.Params.Branch
         [JsonProperty("@vTimeZoneIANA")]
         public string TimeZoneIANA { get; set; } = "America/Mexico_City";
 
+        [JsonProperty("@vCurrency")]
+        public string? Currency { get; set; }
+
+        [JsonProperty("@vCulture")]
+        public string? Culture { get; set; }
+
         [JsonProperty("@vUser")]
         [Required]
         public string User { get; set; } = "SYSTEM";
