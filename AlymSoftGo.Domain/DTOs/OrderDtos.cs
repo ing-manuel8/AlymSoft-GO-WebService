@@ -32,6 +32,8 @@ namespace AlymSoftGo.Domain.DTOs
         public DateTime OrderDate { get; set; }
         public bool IsPaid { get; set; }
         public DateTime? PaidDate { get; set; }
+        public string? ItemsSummary { get; set; }
+        public int ItemsCount { get; set; }
     }
 
     public class OrderDetailDto
