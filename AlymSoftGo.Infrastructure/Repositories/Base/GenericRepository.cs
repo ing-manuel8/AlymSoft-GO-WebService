@@ -55,17 +55,6 @@ namespace AlymSoftGo.Infrastructure.Repositories.Base
         protected async Task<TData> ResolveSpAsync<TData>(Dictionary<string, object>? @params = null, [CallerMemberName] string methodName = "") where TData : class, new()
             => await _dataAccess.ExecuteSpAsync<TData>(Sp(methodName), @params);
 
-        protected async Task<(T1, T2)> ResolveSpAsync<T1, T2>(object @params, [CallerMemberName] string methodName = "")
-            where T1 : class, new()
-            where T2 : class, new()
-        {
-            var parameters = JObject
-                .FromObject(@params, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore })
-                .ToObject<Dictionary<string, object>>();
-
-            return await _dataAccess.ExecuteSpAsync<T1, T2>(Sp(methodName), parameters);
-        }
-
         protected string Sp(string methodName) => $"spr_{DatabaseName}_{EntityName}_{methodName.Replace("Async", string.Empty)}";
     }
 }

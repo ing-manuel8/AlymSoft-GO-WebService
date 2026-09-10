@@ -14,6 +14,9 @@ namespace AlymSoftGo.Domain.DTOs.Branch
         public string Name { get; set; } = string.Empty;
         public string VNombre { set => Name = value; }
 
+        public string? Slug { get; set; }
+        public string? VDominioSlug { set => Slug = value; }
+
         public string? Address { get; set; }
         public string? VDireccion { set => Address = value; }
 

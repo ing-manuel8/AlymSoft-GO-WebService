@@ -15,12 +15,14 @@ namespace AlymSoftGo.Infrastructure.Repositories
 
         public async Task<(List<ModifierGroupDto> Groups, List<ModifierDto> Modifiers)> GetGroupsByCompanyAsync(GetModifierGroupsByCompanyParams @params)
         {
-            return await ResolveSpAsync<List<ModifierGroupDto>, List<ModifierDto>>(@params);
+            var result = await ResolveSpAsync<ModifierGroupsContainerDto>(@params);
+            return (result.Groups, result.Modifiers);
         }
 
         public async Task<(List<ModifierGroupDto> Groups, List<ModifierDto> Modifiers)> GetGroupsByProductAsync(GetModifierGroupsByProductParams @params)
         {
-            return await ResolveSpAsync<List<ModifierGroupDto>, List<ModifierDto>>(@params);
+            var result = await ResolveSpAsync<ModifierGroupsContainerDto>(@params);
+            return (result.Groups, result.Modifiers);
         }
 
         public async Task<EmptyDto> SaveGroupAsync(SaveModifierGroupParams @params)

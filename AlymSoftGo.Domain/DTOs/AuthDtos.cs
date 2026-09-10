@@ -13,6 +13,7 @@ namespace AlymSoftGo.Domain.DTOs
         public int UserId { get; set; }
         public int CompanyId { get; set; }
         public string CompanyName { get; set; } = string.Empty;
+        public string? Slug { get; set; }
         public string Currency { get; set; } = string.Empty;
         public string Culture { get; set; } = string.Empty;
         public int? BranchId { get; set; }

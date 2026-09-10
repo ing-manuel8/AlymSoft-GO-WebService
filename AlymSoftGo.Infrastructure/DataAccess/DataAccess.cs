@@ -28,38 +28,6 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             await ExecuteSpAsync<EmptyDto>(spName, @params);
         }
 
-        public async Task<(T1 Data1, T2 Data2)> ExecuteSpAsync<T1, T2>(string spName, Dictionary<string, object>? @params = null)
-            where T1 : class, new()
-            where T2 : class, new()
-        {
-            var (statusInfo, allDataSets) = await ExecuteSpInternalAsync(spName, @params);
-            var mappedCode = MapSpStatusToEnum(statusInfo.ResponseCode, statusInfo.ErrorDescription);
-
-            if (statusInfo.ResponseType != 1 || mappedCode != ResponseCode.Ok)
-            {
-                ThrowAppropriateException(mappedCode, statusInfo, spName);
-            }
-
-            var json = JsonConvert.SerializeObject(allDataSets);
-            var jsonObject = JObject.Parse(json);
-
-            T1? data1 = default;
-            if (allDataSets.ContainsKey("table1"))
-            {
-                var table1Json = jsonObject["table1"] as JArray;
-                data1 = table1Json?.ToObject<T1>();
-            }
-
-            T2? data2 = default;
-            if (allDataSets.ContainsKey("table2"))
-            {
-                var table2Json = jsonObject["table2"] as JArray;
-                data2 = table2Json?.ToObject<T2>();
-            }
-
-            return (data1 ?? new T1(), data2 ?? new T2());
-        }
-
         public async Task<TData> ExecuteSpAsync<TData>(string spName, Dictionary<string, object>? @params = null) where TData : class, new()
         {
             var (statusInfo, allDataSets) = await ExecuteSpInternalAsync(spName, @params);
@@ -85,27 +53,70 @@ namespace AlymSoftGo.Infrastructure.DataAccess
             {
                 var json = JsonConvert.SerializeObject(allDataSets);
                 var jsonObject = JObject.Parse(json);
-                var tableJson = jsonObject["table1"] as JArray;
+                var table1Json = jsonObject.ContainsKey("table1") ? jsonObject["table1"] as JArray : null;
+
+                // Caso 1: TData es directamente una colección o arreglo (ej. List<ProductDto>)
+                if (typeof(TData).IsArray || (typeof(System.Collections.IEnumerable).IsAssignableFrom(typeof(TData)) && typeof(TData) != typeof(string)))
+                {
+                    return (table1Json?.ToObject<TData>()) ?? new TData();
+                }
+
+                // Caso 2: TData es un objeto/DTO con propiedades
+                var scalarProps = typeof(TData).GetProperties()
+                    .Where(p => (p.PropertyType.IsValueType || p.PropertyType == typeof(string)) && p.CanWrite)
+                    .ToList();
+
+                var listProps = typeof(TData).GetProperties()
+                    .Where(p => typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) 
+                             && p.PropertyType != typeof(string) 
+                             && p.CanWrite)
+                    .ToList();
 
                 TData? data;
-                if (typeof(TData).IsArray || typeof(System.Collections.IEnumerable).IsAssignableFrom(typeof(TData)))
-                    data = tableJson?.ToObject<TData>();
-                else
-                    data = tableJson?[0]?.ToObject<TData>();
 
-                // Si existen tablas adicionales en el SP (ej. table2 para detalle de partidas)
-                if (data != null && allDataSets.ContainsKey("table2"))
+                if (scalarProps.Count > 0)
                 {
-                    var table2Json = jsonObject["table2"] as JArray;
-                    if (table2Json != null && table2Json.Count > 0)
+                    // table1 puebla los campos principales del objeto
+                    data = (table1Json != null && table1Json.Count > 0)
+                        ? table1Json[0].ToObject<TData>()
+                        : new TData();
+
+                    // table2, table3, table4, table5, table6... pueblan las listas hijas en orden
+                    for (int i = 2; i <= allDataSets.Count; i++)
                     {
-                        var listProp = typeof(TData).GetProperties()
-                            .FirstOrDefault(p => typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType) 
-                                              && p.PropertyType != typeof(string));
-                        if (listProp != null && listProp.CanWrite)
+                        var tableKey = $"table{i}";
+                        if (allDataSets.ContainsKey(tableKey))
                         {
-                            var childList = table2Json.ToObject(listProp.PropertyType);
-                            listProp.SetValue(data, childList);
+                            var childTableJson = jsonObject[tableKey] as JArray;
+                            int propIndex = i - 2;
+                            if (propIndex < listProps.Count && childTableJson != null)
+                            {
+                                var targetProp = listProps[propIndex];
+                                var childList = childTableJson.ToObject(targetProp.PropertyType);
+                                targetProp.SetValue(data, childList);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // TData es un contenedor compuesto de múltiples listas
+                    data = new TData();
+
+                    // table1, table2, table3, table4... pueblan las colecciones hijas en orden
+                    for (int i = 1; i <= allDataSets.Count; i++)
+                    {
+                        var tableKey = $"table{i}";
+                        if (allDataSets.ContainsKey(tableKey))
+                        {
+                            var childTableJson = jsonObject[tableKey] as JArray;
+                            int propIndex = i - 1;
+                            if (propIndex < listProps.Count && childTableJson != null)
+                            {
+                                var targetProp = listProps[propIndex];
+                                var childList = childTableJson.ToObject(targetProp.PropertyType);
+                                targetProp.SetValue(data, childList);
+                            }
                         }
                     }
                 }
