@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace AlymSoftGo.Domain.DTOs.Modifier
 {
@@ -7,6 +8,7 @@ namespace AlymSoftGo.Domain.DTOs.Modifier
         public int Id { get; set; }
         public int IdGrupoModificador { set => Id = value; }
 
+        [JsonIgnore]
         public int CompanyId { get; set; }
         public int IdEmpresa { set => CompanyId = value; }
 
